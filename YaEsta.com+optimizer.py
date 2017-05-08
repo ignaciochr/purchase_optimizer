@@ -1,5 +1,5 @@
 # coding: utf-8
-# ## YaEsta.com purchase optimizer
+# YaEsta.com purchase optimizer
 
 import requests
 import bs4
@@ -11,12 +11,12 @@ import numpy as np
 import math
 from itertools import combinations
 
-# **Importing website HTML data to be parsed**
-#To parse local HTML files
+# Importing website HTML data to be parsed
+# To parse local HTML files
 with open(r'C:/Users/ignacio.chavarria/Desktop/Scraping/aaa.html', "r") as f:
     content = f.read()
 
-#To parse from web
+# To parse from web
 #response = requests.get("http://dataquestio.github.io/web-scraping-pages/2014_super_bowl.html")
 #content = response.content
 
@@ -33,9 +33,7 @@ p_d = Soup(content_d, 'html.parser')
 p_s = Soup(content_s, 'html.parser')
 p_c = Soup(content_c, 'html.parser')
 
-
-# **Parsing titles and prices:**
-
+# Parsing titles and prices:
 parsers = [p_d, p_s, p_c]
 
 def cat_name(n):
