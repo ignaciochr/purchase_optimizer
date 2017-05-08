@@ -1,9 +1,5 @@
-
 # coding: utf-8
-
 # ## YaEsta.com purchase optimizer
-
-# In[155]:
 
 import requests
 import bs4
@@ -15,11 +11,7 @@ import numpy as np
 import math
 from itertools import combinations
 
-
 # **Importing website HTML data to be parsed**
-
-# In[156]:
-
 #To parse local HTML files
 with open(r'C:/Users/ignacio.chavarria/Desktop/Scraping/aaa.html', "r") as f:
     content = f.read()
@@ -27,9 +19,6 @@ with open(r'C:/Users/ignacio.chavarria/Desktop/Scraping/aaa.html', "r") as f:
 #To parse from web
 #response = requests.get("http://dataquestio.github.io/web-scraping-pages/2014_super_bowl.html")
 #content = response.content
-
-
-# In[157]:
 
 with open(r"C:\Users\ignacio.chavarria\Desktop\Scraping\YaEsta\drinks.html", encoding="utf8") as f:
     content_d = f.read()
@@ -40,9 +29,6 @@ with open(r"C:\Users\ignacio.chavarria\Desktop\Scraping\YaEsta\snacks.html", "r"
 with open(r"C:\Users\ignacio.chavarria\Desktop\Scraping\YaEsta\chocolates.html", "r", encoding="utf8") as f:
     content_c = f.read()
 
-
-# In[158]:
-
 p_d = Soup(content_d, 'html.parser')
 p_s = Soup(content_s, 'html.parser')
 p_c = Soup(content_c, 'html.parser')
@@ -50,12 +36,7 @@ p_c = Soup(content_c, 'html.parser')
 
 # **Parsing titles and prices:**
 
-# In[159]:
-
 parsers = [p_d, p_s, p_c]
-
-
-# In[160]:
 
 def cat_name(n):
     if n == 0:
@@ -90,18 +71,12 @@ for parser in parsers:
         categories.append(i)
     ct += 1
 
-
-# In[161]:
-
 #Create dataframe
 df = pd.DataFrame(
     {'name': names[:-9],
      'category': categories,
      'price': prices
     })
-
-
-# In[162]:
 
 def amount(i):
     if re.findall('[ ]([0-9\,\.]+)(?=\s*[mMgG]([ lLrR\.]|\Z)([ \.]|\Z))', i):
@@ -115,71 +90,24 @@ def amount(i):
         return math.nan
 
 df['amount'] = df['name'].apply(lambda x: amount(x))
-
-
-# In[163]:
-
 df = df.dropna(subset=['amount']).reset_index(drop=True)
-
-
-# In[164]:
-
-#df['category'].value_counts()
-
-
-# In[165]:
-
 df.shape
-
-
-# In[166]:
-
 df['amount_per_dollar'] =  df['amount'] / df['price']
-
-
-# In[167]:
-
 df['idx'] = df.index
 
-
-# In[168]:
-
+# Define gift card amount
 gc = 5
-
-
-# In[169]:
-
-#df.shape
-
-
-# In[170]:
 
 df = df[df['price'] <= gc]
 df.shape
 
-
-# In[171]:
-
-#df['category'].value_counts()
-
-
-# In[172]:
-
 df_c = df.loc[df['category'] == 'chocolate', :].sort_values('amount_per_dollar', ascending=[False])
 df_d = df.loc[df['category'] == 'drink', :].sort_values('amount_per_dollar', ascending=[False])
 df_s = df.loc[df['category'] == 'snack', :].sort_values('amount_per_dollar', ascending=[False])
-#df_d = df.loc[lambda df: df.category == 'drink', :].sort_values('amount_per_dollar', ascending=[False])
-#df_s = df[df['category'] == 'snack'].sort_values('amount_per_dollar', ascending=[False])
-
-
-# In[173]:
 
 df_s1 = df_s.iloc[:10].sort_values('price', ascending=True)
 df_d1 = df_d.iloc[:10].sort_values('price', ascending=True)
 df_c1 = df_c.iloc[:10].sort_values('price', ascending=True)
-
-
-# In[174]:
 
 dfs = [df_s1, df_d1, df_c1]
 
@@ -197,9 +125,6 @@ for n in range(len(dfs)):
         else:
             break
     d[n] = int(products)
-
-
-# In[175]:
 
 #Find top combinations per segment
 top = {}
@@ -222,13 +147,7 @@ for y in range(len(dfs)):
 
     top[y] = sorted(combination_id.items(), key=lambda x: x[1][2], reverse=True)[0][1:]
 
-
-# In[176]:
-
 top
-
-
-# In[177]:
 
 labels = ["'snack'", "'drink'", "'candy'"]
 
@@ -245,9 +164,6 @@ for i in top:
     print('Total cost: $', top[i][0][1])
     print(gr_or_ml(labels[i]), top[i][0][2])
     print("\n")
-
-
-# In[226]:
 
 from sklearn.utils import shuffle
 
@@ -277,22 +193,13 @@ for df_no in range(len(original_dfs)):
         random_results.append(amount)
     results_dict[df_no] = random_results
 
-
-# In[230]:
-
 print(max(results_dict[1]))
 print(top[1][0][2])
 print(len([x for x in results_dict[1] if x >= top[1][0][2]]))
 
-
-# In[231]:
-
 for i in range(len(labels)):
     print("Random", labels[i], "baskets tie or beat the optimized basket", "%.2f%%" % (100 * 
           len([x for x in results_dict[i] if x >= top[i][0][2]]) / random_baskets), "of the time.")
-
-
-# In[232]:
 
 optimized_amount_snack = top[0][0][2]
 optimized_amount_drink = top[1][0][2]
@@ -304,15 +211,8 @@ for i in range(len(opt_baskets)):
     print("The optimized", labels[i], "basket is over", 
           math.floor((opt_baskets[i] - np.mean(results_dict[i])) / np.std(results_dict[i])), 
           "standard deviations away from the random basket mean")
-    #print(np.mean(results_dict[i]) + (np.std(results_dict[i]) * 3))
-
-
-# In[221]:
 
 print(opt_baskets[0], np.mean(results_dict[0]), np.std(results_dict[0]))
-
-
-# In[237]:
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -346,11 +246,7 @@ sns.despine(right=True)
 plt.tight_layout()
 plt.show()
 
-
-# In[239]:
-
 k = 6
 drink_items = df.loc[df['category'] == 'drink', 'name']
 print("There are", drink_items.shape[0], "total items in the 'drink' category with", 
       (len(list(combinations(drink_items, k)))), "million combinations at k =", k, ".")
-
